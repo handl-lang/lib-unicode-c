@@ -1,0 +1,10 @@
+[package]
+name = "handl-lib-unicode-c"
+version = "0.1.0"
+edition = "2024"
+description = "unicode_c: Handl stdlib port (ADR-0128 split)."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/handl-lang/lib-unicode-c"
+
+# Const-only: pure handl.
+[dependencies]
