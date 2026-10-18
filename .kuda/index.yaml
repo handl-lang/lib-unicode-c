@@ -1,0 +1,19 @@
+name: lib-unicode-c
+root: /home/luis/GitHub/handl-lang/lib-unicode-c
+purpose: ''
+modules:
+- handl-lib-unicode-c
+- lib-unicode-c
+commands:
+- cargo check
+- cargo test --workspace
+provenance:
+  files:
+  - Cargo.toml
+  - src/lib.rs
+  hashes:
+  - 3b6fa952d2351f9825de30efc29f50bc9df096b4
+  - b8f8ee460bf0377e9a54107b22d89b1fd59cc66f
+  commit_sha: 148aab38cce8a30d3e897654d1de8cb62c2ada02
+  generated_at: '1792281231'
+  generator: kuda/0.1.0

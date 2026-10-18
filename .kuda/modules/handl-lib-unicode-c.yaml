@@ -1,0 +1,21 @@
+name: handl-lib-unicode-c
+path: Cargo.toml
+purpose: 'unicode_c: Handl stdlib port (ADR-0128 split).'
+api:
+- name: handl-lib-unicode-c
+  kind: module
+  file: Cargo.toml
+  line: 1
+  module: handl-lib-unicode-c
+deps: []
+notes: ''
+verify:
+- Cargo.toml
+provenance:
+  files:
+  - Cargo.toml
+  hashes:
+  - 3b6fa952d2351f9825de30efc29f50bc9df096b4
+  commit_sha: 148aab38cce8a30d3e897654d1de8cb62c2ada02
+  generated_at: '1792281231'
+  generator: kuda-template/0.1.0
