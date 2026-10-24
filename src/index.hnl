@@ -59,7 +59,12 @@ from "../../lib-intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/uchar_c" i
 -- ffi result probing ---------------------------------------------------------
 
 -- `ffi.load`/`ffi.sym` return `{__tag__: "ok"}` / `{__tag__: "err", ...}`.
-is_ok := (r) ~> if r == null { false } else { r.__tag__ == "ok" }
+is_ok := (r) ~> match r { ok(_): true, _: false }
+
+-- `err`/`ok` ctor-name helpers over `__ctor__`/host-tagged results
+-- (phase-3 WS-F; see `is_ok`).
+is_err := (r) ~> match r { err(_): true, _: false }
+res_tag := (r) ~> match r { ok(_): "ok", err(_): "err", _: "?" }
 
 try_load := (name) ~> if is_ok(ffi.load(name)) { name } else { null }
 
@@ -205,7 +210,7 @@ utf16_dec := (us, n) ~> while { us: us, n: n, acc: [] } {
 -- Generated bindings return `Result<payload, Errno>`; payloads carry the
 -- raw `{ret, buf, vals}` record. `vals[last]` is the `UErrorCode` for
 -- status-tail functions (0 = OK, <0 = warning, >0 = failure).
-payload := (r) ~> if tag.tag_of(r) == "err" { null } else { tag.untag(r).value }
+payload := (r) ~> if is_err(r) { null } else { r.value }
 
 take := (xs, n) ~> while { xs: xs, n: n, acc: [] } {
   (xs, n, acc) ~> if n <= 0 { { out: acc } } else {
@@ -251,7 +256,7 @@ statused := (r, what) ~> do {
 
 -- unwrap a statused payload to its plain value, raising on failure --
 -- the public boundary of this module
-or_raise := (r) ~> if tag.tag_of(r) == "err" { error.raise(tag.untag(r).value) } else { tag.untag(r).value }
+or_raise := (r) ~> if is_err(r) { error.raise(r.value) } else { r.value }
 
 -- unit slice [i, j) of a UTF-16 unit list
 uslice := (us, i, j) ~> take(drop(us, i), j - i)
@@ -365,11 +370,11 @@ graphemes_impl := (s) ~> do {
   if p == 0 { err("malloc failed") } else { do {
     _m = libc_memcpy(p, e.bytes, nb)
     r = statused(ubrk.ubrk_open_78(0, "", p, e.len, 0), "ubrk_open")
-    if tag.tag_of(r) == "err" {
+    if is_err(r) {
       _f = libc_free(p)
       r
     } else {
-      bi = tag.untag(r).value.ret
+      bi = r.value.ret
       units = to_units(bytes.to_list(e.bytes))
       segs = while { pos: brk_int(ubrk.ubrk_first_78(bi)), acc: [] } {
         (pos, acc) ~> if pos < 0 { { out: acc } } else { do {
@@ -391,7 +396,7 @@ graphemes_impl := (s) ~> do {
 
 grapheme_count_impl := (s) ~> do {
   r = graphemes_impl(s)
-  if tag.tag_of(r) == "err" { r } else { ok(list_len(tag.untag(r).value)) }
+  if is_err(r) { r } else { ok(list_len(r.value)) }
 }
 
 -- display width (UAX #11) ------------------------------------------------------
@@ -434,10 +439,10 @@ width_impl := (s) ~> do {
 casefold_impl := (s) ~> do {
   e = utf16_enc(s)
   r = statused(ustring.u_strFoldCase_78(out_cap_units, e.bytes, e.len, 0, 0), "u_strFoldCase")
-  if tag.tag_of(r) == "err" {
+  if is_err(r) {
     r
   } else {
-    v = tag.untag(r).value
+    v = r.value
     if v.ret > out_cap_units {
       err("u_strFoldCase output exceeds " + type.to_string(out_cap_units) + " units")
     } else {
@@ -450,16 +455,16 @@ casefold_impl := (s) ~> do {
 
 norm_impl := (get_inst, s, what) ~> do {
   r0 = statused(get_inst(0), what)
-  if tag.tag_of(r0) == "err" {
+  if is_err(r0) {
     r0
   } else {
-    inst = tag.untag(r0).value.ret
+    inst = r0.value.ret
     e = utf16_enc(s)
     r = statused(unorm2.unorm2_normalize_78(inst, e.bytes, e.len, out_cap_units, 0), what)
-    if tag.tag_of(r) == "err" {
+    if is_err(r) {
       r
     } else {
-      v = tag.untag(r).value
+      v = r.value
       if v.ret > out_cap_units {
         err(what + " output exceeds " + type.to_string(out_cap_units) + " units")
       } else {
