@@ -1,1 +1,1 @@
-{ modules: ["unicode_c"] }
+{ modules: ["unicode_c"], description: "The unicode_c port implementation.", license: "MIT" }
