@@ -51,10 +51,10 @@ from "result" import { ok, err }
 from "bytes" import * as bytes
 
 -- sdkgen-generated ICU4C adapters (libicuuc).
-from "../../lib-intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ubrk_c" import * as ubrk
-from "../../lib-intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/unorm2_c" import * as unorm2
-from "../../lib-intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ustring_c" import * as ustring
-from "../../lib-intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/uchar_c" import * as uchar
+from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ubrk_c" import * as ubrk
+from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/unorm2_c" import * as unorm2
+from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ustring_c" import * as ustring
+from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/uchar_c" import * as uchar
 
 -- ffi result probing ---------------------------------------------------------
 
