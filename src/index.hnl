@@ -3,7 +3,7 @@
 --- Implements the `unicode.*` surface declared in
 --- `handl-packages/unicode/unicode.hnl` on the host's `libicuuc` via the
 --- sdkgen-generated bindings in
---- `handl-packages/generated/icu-uc-c-linux-x86_64/` (produced by
+--- `intl-c/handl-packages/generated/icu-uc/icu-uc-c-linux-x86_64/` (produced by
 --- `generated/icu-uc.sdkgen.yaml`; regenerate on ICU major-version bumps --
 --- symbol names carry the `urename.h` suffix, e.g. `unorm2_normalize_78`).
 ---
@@ -51,10 +51,10 @@ from "result" import { ok, err }
 from "bytes" import * as bytes
 
 -- sdkgen-generated ICU4C adapters (libicuuc).
-from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ubrk_c" import * as ubrk
-from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/unorm2_c" import * as unorm2
-from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/ustring_c" import * as ustring
-from "intl-c/handl-packages/generated/icu-uc-c-linux-x86_64/uchar_c" import * as uchar
+from "intl-c/handl-packages/generated/icu-uc/icu-uc-c-linux-x86_64/ubrk_c" import * as ubrk
+from "intl-c/handl-packages/generated/icu-uc/icu-uc-c-linux-x86_64/unorm2_c" import * as unorm2
+from "intl-c/handl-packages/generated/icu-uc/icu-uc-c-linux-x86_64/ustring_c" import * as ustring
+from "intl-c/handl-packages/generated/icu-uc/icu-uc-c-linux-x86_64/uchar_c" import * as uchar
 
 -- ffi result probing ---------------------------------------------------------
 
