@@ -70,7 +70,7 @@ try_load := (name) ~> if is_ok(ffi.load(name)) { name } else { null }
 
 -- `stem` is e.g. "libicuuc.so"; probe the bare soname, then `stem.<major>`.
 find_lib := (stem) ~> do {
-  hit = try_load(stem)
+  hit := try_load(stem)
   if hit != null { hit } else {
     while { v: 99, found: null } {
       (v, found) ~> if found != null || v < 50 {
@@ -144,13 +144,13 @@ enc_cp := (cp) ~> if cp < 65536 {
 u8_step := (b, t, acc) ~> if b < 128 {
   { state: { bs: t, acc: [...acc, ...enc_cp(b)] } }
 } else if b < 224 {
-  s = u8_cp1(b, t)
+  s := u8_cp1(b, t)
   { state: { bs: s.rest, acc: [...acc, ...enc_cp(s.cp)] } }
 } else if b < 240 {
-  s = u8_cp2(b, t)
+  s := u8_cp2(b, t)
   { state: { bs: s.rest, acc: [...acc, ...enc_cp(s.cp)] } }
 } else {
-  s = u8_cp3(b, t)
+  s := u8_cp3(b, t)
   { state: { bs: s.rest, acc: [...acc, ...enc_cp(s.cp)] } }
 }
 
@@ -240,12 +240,12 @@ nz := (v, d) ~> if v == null { d } else { v }
 
 -- unwrap a `{ret, buf, vals}` result into `ok v` / `err "<what> failed..."`
 statused := (r, what) ~> do {
-  v = payload(r)
+  v := payload(r)
   if type.of(v) != "object" {
     err(what)
   } else {
-    vs = nz(v.vals, [])
-    st = nz(at(vs, list_len(vs) - 1), 0)
+    vs := nz(v.vals, [])
+    st := nz(at(vs, list_len(vs) - 1), 0)
     if st > 0 {
       err(what + " code " + type.to_string(st))
     } else {
@@ -289,8 +289,8 @@ out_cap_units := 32768
 -- UTF-8 decode: [byte_offset, code_point] pairs --------------------------------
 
 dec_step_u8 := (b, t, off, acc) ~> do {
-  d = if b < 128 { { cp: b, rest: t } } else if b < 224 { u8_cp1(b, t) } else if b < 240 { u8_cp2(b, t) } else { u8_cp3(b, t) }
-  used = (list_len(t) + 1) - list_len(d.rest)
+  d := if b < 128 { { cp: b, rest: t } } else if b < 224 { u8_cp1(b, t) } else if b < 240 { u8_cp2(b, t) } else { u8_cp3(b, t) }
+  used := (list_len(t) + 1) - list_len(d.rest)
   { state: { bs: d.rest, off: off + used, acc: [...acc, [off, d.cp]] } }
 }
 
@@ -322,7 +322,7 @@ is_ascii_impl := (s) ~> all_of(char.chars(s), c ~> char.code_point(c) < 128)
 -- identifier categories (UAX #31) ---------------------------------------------
 
 xid_cp := (cp, which) ~> do {
-  v = payload(uchar.u_hasBinaryProperty_78(cp, which))
+  v := payload(uchar.u_hasBinaryProperty_78(cp, which))
   if v == null { false } else { math.bit_and(v, 255) != 0 }
 }
 
@@ -359,43 +359,43 @@ libc_memcpy := (dst, src, n) ~> ffi.call("libc.so.6", "memcpy", [dst, src, n], [
 
 -- boundary calls return a bare integer (no out-slots in the descriptor)
 brk_int := (r) ~> do {
-  v = payload(r)
+  v := payload(r)
   if v == null { -1 } else { v }
 }
 
 graphemes_impl := (s) ~> do {
-  e = utf16_enc(s)
-  nb = e.len * 2
-  p = libc_malloc(nb)
+  e := utf16_enc(s)
+  nb := e.len * 2
+  p := libc_malloc(nb)
   if p == 0 { err("malloc failed") } else { do {
-    _m = libc_memcpy(p, e.bytes, nb)
-    r = statused(ubrk.ubrk_open_78(0, "", p, e.len, 0), "ubrk_open")
+    _m := libc_memcpy(p, e.bytes, nb)
+    r := statused(ubrk.ubrk_open_78(0, "", p, e.len, 0), "ubrk_open")
     if is_err(r) {
-      _f = libc_free(p)
+      _f := libc_free(p)
       r
     } else {
-      bi = r.value.ret
-      units = to_units(bytes.to_list(e.bytes))
-      segs = while { pos: brk_int(ubrk.ubrk_first_78(bi)), acc: [] } {
+      bi := r.value.ret
+      units := to_units(bytes.to_list(e.bytes))
+      segs := while { pos: brk_int(ubrk.ubrk_first_78(bi)), acc: [] } {
         (pos, acc) ~> if pos < 0 { { out: acc } } else { do {
-          nx = brk_int(ubrk.ubrk_next_78(bi))
+          nx := brk_int(ubrk.ubrk_next_78(bi))
           if nx < 0 {
             { out: acc }
           } else {
-            seg = utf16_dec(uslice(units, pos, nx), nx - pos)
+            seg := utf16_dec(uslice(units, pos, nx), nx - pos)
             { state: { pos: nx, acc: [...acc, seg] } }
           }
         } }
       }
-      _c = ubrk.ubrk_close_78(bi)
-      _f = libc_free(p)
+      _c := ubrk.ubrk_close_78(bi)
+      _f := libc_free(p)
       ok(segs)
     }
   } }
 }
 
 grapheme_count_impl := (s) ~> do {
-  r = graphemes_impl(s)
+  r := graphemes_impl(s)
   if is_err(r) { r } else { ok(list_len(r.value)) }
 }
 
@@ -406,15 +406,15 @@ grapheme_count_impl := (s) ~> do {
 zero_width_cat := (t) ~> t == uchar.U_NON_SPACING_MARK || t == uchar.U_ENCLOSING_MARK || t == uchar.U_LINE_SEPARATOR || t == uchar.U_PARAGRAPH_SEPARATOR || t == uchar.U_CONTROL_CHAR || t == uchar.U_FORMAT_CHAR
 
 w_cp := (cp) ~> do {
-  t = payload(uchar.u_charType_78(cp))
+  t := payload(uchar.u_charType_78(cp))
   if t == null {
     1
   } else {
-    cat = math.bit_and(t, 255)
+    cat := math.bit_and(t, 255)
     if zero_width_cat(cat) {
       0
     } else {
-      ea = payload(uchar.u_getIntPropertyValue_78(cp, uchar.UCHAR_EAST_ASIAN_WIDTH))
+      ea := payload(uchar.u_getIntPropertyValue_78(cp, uchar.UCHAR_EAST_ASIAN_WIDTH))
       if ea == null {
         1
       } else {
@@ -425,7 +425,7 @@ w_cp := (cp) ~> do {
 }
 
 width_impl := (s) ~> do {
-  xs = map_list(char.chars(s), c ~> w_cp(char.code_point(c)))
+  xs := map_list(char.chars(s), c ~> w_cp(char.code_point(c)))
   while { xs: xs, acc: 0 } {
     (xs, acc) ~> match xs {
       []: { out: acc },
@@ -437,12 +437,12 @@ width_impl := (s) ~> do {
 -- case folding (CaseFolding.txt) -----------------------------------------------
 
 casefold_impl := (s) ~> do {
-  e = utf16_enc(s)
-  r = statused(ustring.u_strFoldCase_78(out_cap_units, e.bytes, e.len, 0, 0), "u_strFoldCase")
+  e := utf16_enc(s)
+  r := statused(ustring.u_strFoldCase_78(out_cap_units, e.bytes, e.len, 0, 0), "u_strFoldCase")
   if is_err(r) {
     r
   } else {
-    v = r.value
+    v := r.value
     if v.ret > out_cap_units {
       err("u_strFoldCase output exceeds " + type.to_string(out_cap_units) + " units")
     } else {
@@ -454,17 +454,17 @@ casefold_impl := (s) ~> do {
 -- normalization (UAX #15) ------------------------------------------------------
 
 norm_impl := (get_inst, s, what) ~> do {
-  r0 = statused(get_inst(0), what)
+  r0 := statused(get_inst(0), what)
   if is_err(r0) {
     r0
   } else {
-    inst = r0.value.ret
-    e = utf16_enc(s)
-    r = statused(unorm2.unorm2_normalize_78(inst, e.bytes, e.len, out_cap_units, 0), what)
+    inst := r0.value.ret
+    e := utf16_enc(s)
+    r := statused(unorm2.unorm2_normalize_78(inst, e.bytes, e.len, out_cap_units, 0), what)
     if is_err(r) {
       r
     } else {
-      v = r.value
+      v := r.value
       if v.ret > out_cap_units {
         err(what + " output exceeds " + type.to_string(out_cap_units) + " units")
       } else {
