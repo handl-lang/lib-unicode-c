@@ -1,1 +1,1 @@
-{ modules: ["unicode_c"], deps: { "intl-c": "branch:main" }, description: "The unicode_c port implementation.", license: "MIT" }
+{ modules: ["unicode_c"], name: "unicode-c", deps: { "intl-c": "branch:main" }, description: "The unicode_c port implementation.", license: "MIT" }
